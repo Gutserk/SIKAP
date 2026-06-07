@@ -1,0 +1,55 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+:root {
+  --primary: #14b8a6;
+  --on-primary: #ffffff;
+  --primary-container: #ccfbf1;
+  --on-primary-container: #134e4a;
+  --secondary: #06b6d4;
+  --on-secondary: #ffffff;
+  --secondary-container: #cffafe;
+  --on-secondary-container: #164e63;
+  --surface: #f0fdfa;
+  --surface-dim: #99f6e4;
+  --surface-container-highest: #f0fdfa;
+  --surface-container-high: #ffffff;
+  --surface-container: #ccfbf1;
+  --surface-container-low: #99f6e4;
+  --surface-container-lowest: #5eead4;
+  --on-surface: #0f172a;
+  --on-surface-variant: #0f766e;
+  --outline: #99f6e4;
+  --outline-variant: #ccfbf1;
+  --error: #dc2626;
+  --on-error: #ffffff;
+  --success: #16a34a;
+  --warning: #d97706;
+}
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-primary-container: var(--primary-container);
+  --color-on-primary-container: var(--on-primary-container);
+  --color-secondary: var(--secondary);
+  --color-on-secondary: var(--on-secondary);
+  --color-secondary-container: var(--secondary-container);
+  --color-on-secondary-container: var(--on-secondary-container);
+  --color-surface: var(--surface);
+  --color-surface-dim: var(--surface-dim);
+  --color-surface-container-highest: var(--surface-container-highest);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container-lowest: var(--surface-container-lowest);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+  --color-error: var(--error);
+  --color-on-error: var(--on-error);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+}
