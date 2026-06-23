@@ -9,23 +9,25 @@ class Respondent extends Model
 {
     use HasFactory;
 
+    protected $table = 'responden';
+
     public $timestamps = false;
 
     protected $fillable = [
-        'name',
-        'gender',
+        'nama',
+        'jenis_kelamin',
         'email',
-        'education',
-        'age',
-        'created_at',
+        'pendidikan',
+        'usia',
+        'dibuat_pada',
     ];
 
     protected $casts = [
-        'created_at' => 'datetime',
+        'dibuat_pada' => 'datetime',
     ];
 
     public function submissions()
     {
-        return $this->hasMany(Submission::class);
+        return $this->hasMany(Submission::class, 'responden_id');
     }
 }

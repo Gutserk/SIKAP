@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Daftar Survei - SIKAP Diskominfo Batam')
+@section('title', 'Daftar Survei - SIKAP')
 
 @section('public_content')
 <div class="bg-surface py-12 lg:py-20 px-4 sm:px-6 lg:px-8">
@@ -30,10 +30,10 @@
                 <!-- Card Body -->
                 <div class="p-6 flex-grow flex flex-col">
                     <h3 class="text-xl font-bold text-on-surface mb-3 group-hover:text-primary transition-colors line-clamp-2">
-                        {{ $survey->title }}
+                        {{ $survey->judul }}
                     </h3>
                     <p class="text-on-surface-variant text-sm mb-6 line-clamp-3 flex-grow leading-relaxed">
-                        {{ $survey->description }}
+                        {{ $survey->deskripsi }}
                     </p>
 
                     <!-- Meta Info -->
@@ -42,11 +42,11 @@
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
                             {{ $survey->questions_count }} Pertanyaan
                         </div>
-                        @if($survey->end_date)
+                        @if($survey->tanggal_selesai)
                         <div class="w-px h-4 bg-outline-variant"></div>
                         <div class="flex items-center gap-1.5">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                            Sampai {{ $survey->end_date->format('d M Y') }}
+                            Sampai {{ $survey->tanggal_selesai->format('d M Y') }}
                         </div>
                         @endif
                     </div>

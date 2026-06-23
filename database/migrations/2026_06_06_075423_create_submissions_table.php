@@ -6,26 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('submissions', function (Blueprint $table) {
+        Schema::create('pengisian', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('respondent_id')->constrained('respondents')->restrictOnDelete();
-            $table->foreignId('survey_id')->constrained('surveys')->cascadeOnDelete();
-            $table->timestamp('submitted_at')->useCurrent();
-            
-            $table->unique(['respondent_id', 'survey_id']);
+            $table->foreignId('responden_id')->constrained('responden')->restrictOnDelete();
+            $table->foreignId('survei_id')->constrained('survei')->cascadeOnDelete();
+            $table->timestamp('dikirim_pada')->useCurrent();
+
+            $table->unique(['responden_id', 'survei_id']);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('submissions');
+        Schema::dropIfExists('pengisian');
     }
 };

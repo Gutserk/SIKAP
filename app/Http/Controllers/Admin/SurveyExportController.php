@@ -24,7 +24,7 @@ class SurveyExportController extends Controller
 
         Log::channel('audit')->info('Survey exported as Excel', [
             'survey_id'   => $survey->id,
-            'title'       => $survey->title,
+            'judul'       => $survey->judul,
             'admin_id'    => auth('admin')->id(),
             'admin_email' => auth('admin')->user()->email,
             'ip'          => request()->ip(),
@@ -39,13 +39,13 @@ class SurveyExportController extends Controller
 
         Log::channel('audit')->info('Survey exported as PDF', [
             'survey_id'   => $survey->id,
-            'title'       => $survey->title,
+            'judul'       => $survey->judul,
             'admin_id'    => auth('admin')->id(),
             'admin_email' => auth('admin')->user()->email,
             'ip'          => request()->ip(),
         ]);
 
-        $survey->load(['questions.options', 'submissions.answers']);
+        $survey->load(['questions.options', 'submissions.respondent', 'submissions.answers.option', 'submissions.answers.sentimentResult']);
 
         $pdf = Pdf::loadView('admin.surveys.export_pdf', compact('survey'));
 

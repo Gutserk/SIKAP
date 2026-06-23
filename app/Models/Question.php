@@ -9,28 +9,34 @@ class Question extends Model
 {
     use HasFactory;
 
+    protected $table = 'pertanyaan';
+
     public $timestamps = false;
 
     protected $fillable = [
-        'survey_id',
-        'question_text',
-        'question_type',
-        'order',
-        'is_required',
+        'survei_id',
+        'teks_pertanyaan',
+        'tipe_pertanyaan',
+        'urutan',
+        'wajib_diisi',
+        'skala_min',
+        'skala_max',
+        'skala_min_label',
+        'skala_max_label',
     ];
 
     public function survey()
     {
-        return $this->belongsTo(Survey::class);
+        return $this->belongsTo(Survey::class, 'survei_id');
     }
 
     public function options()
     {
-        return $this->hasMany(Option::class);
+        return $this->hasMany(Option::class, 'pertanyaan_id');
     }
 
     public function answers()
     {
-        return $this->hasMany(Answer::class);
+        return $this->hasMany(Answer::class, 'pertanyaan_id');
     }
 }

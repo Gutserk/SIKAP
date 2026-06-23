@@ -2,27 +2,25 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class AdminSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        \App\Models\Admin::create([
-            'full_name' => 'Administrator',
-            'email' => 'admin@batam.go.id',
-            'password' => \Illuminate\Support\Facades\Hash::make('password'),
-        ]);
+        $admins = [
+            [
+                'nama_lengkap' => 'Mirza Ardanas',
+                'email'        => 'ardanasmirza@batam.go.id',
+                'kata_sandi'   => 'password',
+            ],
+        ];
 
-        for ($i = 1; $i <= 11; $i++) {
+        foreach ($admins as $admin) {
             \App\Models\Admin::create([
-                'full_name' => "Admin Test $i",
-                'email' => "admin$i@batam.go.id",
-                'password' => \Illuminate\Support\Facades\Hash::make('password123'),
+                'nama_lengkap' => $admin['nama_lengkap'],
+                'email'        => $admin['email'],
+                'kata_sandi'   => \Illuminate\Support\Facades\Hash::make($admin['kata_sandi']),
             ]);
         }
     }

@@ -9,32 +9,34 @@ class Answer extends Model
 {
     use HasFactory;
 
+    protected $table = 'jawaban';
+
     public $timestamps = false;
 
     protected $fillable = [
-        'submission_id',
-        'question_id',
-        'option_id',
-        'answer_text',
+        'pengisian_id',
+        'pertanyaan_id',
+        'pilihan_id',
+        'teks_jawaban',
     ];
 
     public function submission()
     {
-        return $this->belongsTo(Submission::class);
+        return $this->belongsTo(Submission::class, 'pengisian_id');
     }
 
     public function question()
     {
-        return $this->belongsTo(Question::class);
+        return $this->belongsTo(Question::class, 'pertanyaan_id');
     }
 
     public function option()
     {
-        return $this->belongsTo(Option::class);
+        return $this->belongsTo(Option::class, 'pilihan_id');
     }
 
     public function sentimentResult()
     {
-        return $this->hasOne(SentimentResult::class);
+        return $this->hasOne(SentimentResult::class, 'jawaban_id');
     }
 }

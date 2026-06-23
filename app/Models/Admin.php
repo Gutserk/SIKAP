@@ -9,24 +9,31 @@ class Admin extends Authenticatable
 {
     use HasFactory;
 
+    protected $table = 'admin';
+
     protected $fillable = [
-        'full_name',
+        'nama_lengkap',
         'email',
-        'password',
-        'last_login_at',
+        'kata_sandi',
+        'terakhir_masuk_pada',
     ];
 
     protected $hidden = [
-        'password',
+        'kata_sandi',
     ];
 
     protected $casts = [
-        'last_login_at' => 'datetime',
-        'password' => 'hashed',
+        'terakhir_masuk_pada' => 'datetime',
+        'kata_sandi' => 'hashed',
     ];
+
+    public function getAuthPassword(): string
+    {
+        return $this->kata_sandi;
+    }
 
     public function surveys()
     {
-        return $this->hasMany(Survey::class);
+        return $this->hasMany(Survey::class, 'admin_id');
     }
 }

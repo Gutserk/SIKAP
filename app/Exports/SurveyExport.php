@@ -19,14 +19,14 @@ class SurveyExport implements FromCollection, WithHeadings, WithMapping, ShouldA
     {
         $this->surveyId = $surveyId;
         $survey = Survey::with('questions')->findOrFail($surveyId);
-        $this->questions = $survey->questions()->orderBy('order')->get();
+        $this->questions = $survey->questions()->orderBy('urutan')->get();
     }
 
     public function collection()
     {
         return Survey::findOrFail($this->surveyId)
             ->submissions()
-            ->with(['respondent', 'answers'])
+            ->with(['respondent', 'answers.option', 'answers.sentimentResult'])
             ->get();
     }
 
@@ -35,10 +35,20 @@ class SurveyExport implements FromCollection, WithHeadings, WithMapping, ShouldA
         $headers = [
             'No',
             'Waktu Pengisian',
+            'Nama Responden',
+            'Email',
+            'Jenis Kelamin',
+            'Usia',
+            'Pendidikan',
         ];
 
         foreach ($this->questions as $question) {
-            $headers[] = $question->question_text;
+            $headers[] = $question->teks_pertanyaan;
+
+            if ($question->tipe_pertanyaan === 'esai') {
+                $headers[] = $question->teks_pertanyaan . ' - Sentimen';
+                $headers[] = $question->teks_pertanyaan . ' - Confidence';
+            }
         }
 
         return $headers;
@@ -51,21 +61,37 @@ class SurveyExport implements FromCollection, WithHeadings, WithMapping, ShouldA
 
         $row = [
             $rowNumber,
-            $submission->submitted_at ? \Carbon\Carbon::parse($submission->submitted_at)->format('Y-m-d H:i:s') : '-',
+            $submission->dikirim_pada
+                ? \Carbon\Carbon::parse($submission->dikirim_pada)->format('Y-m-d H:i:s')
+                : '-',
+            $submission->respondent->nama ?? '-',
+            $submission->respondent->email ?? '-',
+            $submission->respondent->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan',
+            $submission->respondent->usia ?? '-',
+            $submission->respondent->pendidikan ?? '-',
         ];
 
-        // Map answers to the correct columns based on questions
         foreach ($this->questions as $question) {
-            $answer = $submission->answers->where('question_id', $question->id)->first();
-            
+            $answer = $submission->answers->where('pertanyaan_id', $question->id)->first();
+
             if ($answer) {
-                if ($question->question_type == 'multiple_choice' && $answer->option_id) {
-                    $row[] = $answer->option->option_text ?? '-';
+                if ($question->tipe_pertanyaan == 'pilihan_ganda' && $answer->pilihan_id) {
+                    $row[] = $answer->option->teks_pilihan ?? '-';
                 } else {
-                    $row[] = $answer->answer_text ?? '-';
+                    $row[] = $answer->teks_jawaban ?? '-';
                 }
             } else {
                 $row[] = '-';
+            }
+
+            if ($question->tipe_pertanyaan === 'esai') {
+                if ($answer && $answer->sentimentResult) {
+                    $row[] = ucfirst($answer->sentimentResult->sentimen);
+                    $row[] = round($answer->sentimentResult->skor * 100, 1) . '%';
+                } else {
+                    $row[] = '-';
+                    $row[] = '-';
+                }
             }
         }
 

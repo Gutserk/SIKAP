@@ -155,14 +155,14 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <p class="font-semibold text-on-surface text-sm truncate group-hover:text-primary transition-colors">{{ $survey->title }}</p>
+                                <p class="font-semibold text-on-surface text-sm truncate group-hover:text-primary transition-colors">{{ $survey->judul }}</p>
                                 <div class="flex items-center gap-2 mt-1">
                                     @php
                                         $s = match($survey->status) {
-                                            'active' => ['label' => 'Aktif', 'class' => 'text-success'],
-                                            'draft'  => ['label' => 'Draft', 'class' => 'text-on-surface-variant'],
-                                            'closed' => ['label' => 'Ditutup', 'class' => 'text-warning'],
-                                            default  => ['label' => $survey->status, 'class' => 'text-on-surface-variant'],
+                                            'aktif'   => ['label' => 'Aktif',   'class' => 'text-success'],
+                                            'draf'    => ['label' => 'Draft',   'class' => 'text-on-surface-variant'],
+                                            'ditutup' => ['label' => 'Ditutup', 'class' => 'text-warning'],
+                                            default   => ['label' => $survey->status, 'class' => 'text-on-surface-variant'],
                                         };
                                     @endphp
                                     <span class="text-xs font-bold {{ $s['class'] }}">{{ $s['label'] }}</span>

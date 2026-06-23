@@ -22,7 +22,7 @@
         @else
             <a href="{{ route('login') }}" class="btn bg-surface border border-outline-variant text-on-surface-variant hover:text-primary hover:border-primary shadow-sm rounded-xl btn-sm px-4">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
-                Login Petugas
+                Login Admin
             </a>
         @endauth
     </div>
@@ -39,7 +39,7 @@
             @auth('admin')
                 <li><a href="{{ route('admin.dashboard') }}" class="text-primary">Dashboard Admin</a></li>
             @else
-                <li><a href="{{ route('login') }}">Login Petugas</a></li>
+                <li><a href="{{ route('login') }}">Login Admin</a></li>
             @endauth
         </ul>
     </div>

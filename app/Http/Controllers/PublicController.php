@@ -7,13 +7,19 @@ use App\Models\Survey;
 use App\Models\Respondent;
 use App\Models\Submission;
 use App\Models\Answer;
+use App\Models\SentimentResult;
+use App\Services\SentimentService;
 
 class PublicController extends Controller
 {
+    public function __construct(private SentimentService $sentimentService)
+    {
+    }
+
     public function home()
     {
         $activeSurveys = Survey::withCount('questions')
-            ->where('status', 'active')
+            ->where('status', 'aktif')
             ->latest()
             ->take(6)
             ->get();
@@ -24,7 +30,7 @@ class PublicController extends Controller
     public function surveys()
     {
         $surveys = Survey::withCount('questions')
-            ->where('status', 'active')
+            ->where('status', 'aktif')
             ->latest()
             ->get();
 
@@ -34,38 +40,35 @@ class PublicController extends Controller
     public function show($id)
     {
         $survey = Survey::with(['questions' => function($q) {
-            $q->orderBy('order')->with('options');
-        }])->where('status', 'active')->findOrFail($id);
+            $q->orderBy('urutan')->with('options');
+        }])->where('status', 'aktif')->findOrFail($id);
 
         return view('public.surveys.show', compact('survey'));
     }
 
     public function submit(Request $request, $id)
     {
-        $survey = Survey::with(['questions.options'])->where('status', 'active')->findOrFail($id);
+        $survey = Survey::with(['questions.options'])->where('status', 'aktif')->findOrFail($id);
 
-        // Cek rentang tanggal survei
         $today = now()->startOfDay();
-        if ($survey->start_date && $today->lt($survey->start_date)) {
+        if ($survey->tanggal_mulai && $today->lt($survey->tanggal_mulai)) {
             return back()->with('error', 'Survei ini belum dibuka untuk pengisian.')->withInput();
         }
-        if ($survey->end_date && $today->gt($survey->end_date)) {
+        if ($survey->tanggal_selesai && $today->gt($survey->tanggal_selesai)) {
             return back()->with('error', 'Survei ini sudah berakhir dan tidak dapat diisi lagi.')->withInput();
         }
 
-        // Validasi identitas responden
         $request->validate([
-            'name'        => 'required|string|max:100',
-            'gender'      => 'required|in:M,F',
-            'age'         => 'required|integer|min:1|max:120',
-            'education'   => 'required|in:SD,SMP,SMA,D3,S1,S2,S3',
-            'email'       => 'required|email|max:150',
+            'name'      => 'required|string|max:100',
+            'gender'    => 'required|in:L,P',
+            'age'       => 'required|integer|min:1|max:120',
+            'education' => 'required|in:SD,SMP,SMA,D3,S1,S2,S3',
+            'email'     => 'required|email|max:150',
         ]);
 
-        // Validasi pertanyaan wajib
         $answerRules = [];
         foreach ($survey->questions as $question) {
-            if ($question->is_required) {
+            if ($question->wajib_diisi) {
                 $answerRules['answers.' . $question->id] = 'required';
             }
         }
@@ -77,49 +80,56 @@ class PublicController extends Controller
             $request->validate($answerRules, $messages);
         }
 
-        // Cari atau buat respondent berdasarkan email (hindari duplikat)
         $respondent = Respondent::firstOrCreate(
             ['email' => $request->email],
             [
-                'name'       => $request->name,
-                'gender'     => $request->gender,
-                'age'        => $request->age,
-                'education'  => $request->education,
-                'created_at' => now(),
+                'nama'          => $request->name,
+                'jenis_kelamin' => $request->gender,
+                'usia'          => $request->age,
+                'pendidikan'    => $request->education,
+                'dibuat_pada'   => now(),
             ]
         );
 
-        // Cegah submit survei yang sama dua kali
-        if (Submission::where('survey_id', $survey->id)->where('respondent_id', $respondent->id)->exists()) {
+        if (Submission::where('survei_id', $survey->id)->where('responden_id', $respondent->id)->exists()) {
             return back()->with('error', 'Anda sudah pernah mengisi survei ini sebelumnya.')->withInput();
         }
 
-        // Buat submission
         $submission = Submission::create([
-            'survey_id'      => $survey->id,
-            'respondent_id'  => $respondent->id,
-            'submitted_at'   => now(),
+            'survei_id'    => $survey->id,
+            'responden_id' => $respondent->id,
+            'dikirim_pada' => now(),
         ]);
 
-        // Simpan jawaban
         foreach ($survey->questions as $question) {
             $answerValue = $request->input('answers.' . $question->id);
             if ($answerValue !== null && $answerValue !== '') {
                 $answerData = [
-                    'submission_id' => $submission->id,
-                    'question_id'   => $question->id,
-                    'answer_text'   => is_array($answerValue) ? implode(', ', $answerValue) : $answerValue,
+                    'pengisian_id'  => $submission->id,
+                    'pertanyaan_id' => $question->id,
+                    'teks_jawaban'  => is_array($answerValue) ? implode(', ', $answerValue) : $answerValue,
                 ];
 
-                // Simpan option_id untuk pilihan ganda agar analitik berfungsi
-                if ($question->question_type === 'multiple_choice') {
-                    $option = $question->options->firstWhere('option_text', $answerValue);
+                if ($question->tipe_pertanyaan === 'pilihan_ganda') {
+                    $option = $question->options->firstWhere('teks_pilihan', $answerValue);
                     if ($option) {
-                        $answerData['option_id'] = $option->id;
+                        $answerData['pilihan_id'] = $option->id;
                     }
                 }
 
-                Answer::create($answerData);
+                $answer = Answer::create($answerData);
+
+                if ($question->tipe_pertanyaan === 'esai' && !is_array($answerValue)) {
+                    $result = $this->sentimentService->analyze($answerValue);
+                    if ($result !== null) {
+                        SentimentResult::create([
+                            'jawaban_id'      => $answer->id,
+                            'sentimen'        => $result['sentimen'],
+                            'skor'            => $result['skor'],
+                            'dianalisis_pada' => now(),
+                        ]);
+                    }
+                }
             }
         }
 

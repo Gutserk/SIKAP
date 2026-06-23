@@ -1,9 +1,9 @@
 @extends('layouts.public')
 
-@section('title', 'Terima Kasih - SIKAP Diskominfo Batam')
+@section('title', 'Terima Kasih - SIKAP ')
 
 @section('public_content')
-<div class="bg-surface-container min-h-screen flex items-center justify-center py-16 px-4">
+<div class="min-h-screen flex items-center justify-center py-16 px-4">
     <div class="max-w-md w-full text-center">
 
         <!-- Success Icon -->
@@ -19,10 +19,7 @@
         </p>
 
         <div class="flex flex-col sm:flex-row gap-3 justify-center">
-            <a href="{{ route('surveys.index') }}" class="btn btn-primary rounded-xl px-8 shadow-none no-animation">
-                Isi Survei Lain
-            </a>
-            <a href="{{ route('home') }}" class="btn bg-surface hover:bg-surface-container border border-outline-variant text-on-surface rounded-xl px-8 shadow-none no-animation">
+            <a href="{{ route('home') }}" class="btn bg-primary hover:bg-primary/90 text-on-primary rounded-xl px-8 shadow-lg shadow-primary/30 border-none no-animation">
                 Kembali ke Beranda
             </a>
         </div>

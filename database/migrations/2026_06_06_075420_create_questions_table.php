@@ -6,26 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('questions', function (Blueprint $table) {
+        Schema::create('pertanyaan', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('survey_id')->constrained('surveys')->cascadeOnDelete();
-            $table->text('question_text');
-            $table->enum('question_type', ['multiple_choice', 'essay']);
-            $table->unsignedTinyInteger('order');
-            $table->boolean('is_required');
+            $table->foreignId('survei_id')->constrained('survei')->cascadeOnDelete();
+            $table->text('teks_pertanyaan');
+            $table->enum('tipe_pertanyaan', ['pilihan_ganda', 'esai']);
+            $table->unsignedTinyInteger('urutan');
+            $table->boolean('wajib_diisi');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('questions');
+        Schema::dropIfExists('pertanyaan');
     }
 };

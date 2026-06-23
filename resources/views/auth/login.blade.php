@@ -19,7 +19,7 @@
                         <div class="flex flex-col items-center gap-2 text-center">
                             <h1 class="text-2xl font-bold text-on-surface">Selamat Datang di SIKAP</h1>
                             <p class="text-on-surface-variant text-sm text-balance">
-                                Masuk ke akun Petugas
+                                Masuk ke akun admin
                             </p>
                         </div>
 
@@ -49,7 +49,7 @@
                                 type="email"
                                 name="email"
                                 value="{{ old('email') }}"
-                                placeholder="admin@batam.go.id"
+                                placeholder="contoh@batam.go.id"
                                 class="input input-bordered border-outline w-full rounded-xl bg-surface-container text-on-surface placeholder:text-on-surface-variant/70 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/30 transition-all duration-200"
                                 required
                                 autofocus
@@ -73,7 +73,7 @@
 
                         {{-- Login Button --}}
                         <button type="submit" class="btn bg-primary text-on-primary rounded-lg  border-none w-full font-semibold tracking-wide hover:brightness-110 active:scale-[0.98] transition-all duration-200">
-                            Masuk
+                            Login
                         </button>
 
                         {{-- Footer Info --}}

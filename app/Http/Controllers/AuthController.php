@@ -9,12 +9,8 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    /**
-     * Show the login form.
-     */
     public function showLoginForm()
     {
-        // If already logged in as admin, redirect to dashboard
         if (Auth::guard('admin')->check()) {
             return redirect()->route('admin.dashboard');
         }
@@ -22,12 +18,9 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    /**
-     * Handle an authentication attempt.
-     */
     public function login(Request $request)
     {
-        $credentials = $request->validate([
+        $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
@@ -41,10 +34,17 @@ class AuthController extends Controller
             ])->onlyInput('email');
         }
 
+        $credentials = [
+            'email'    => $request->email,
+            'password' => $request->password,
+        ];
+
         if (Auth::guard('admin')->attempt($credentials)) {
             RateLimiter::clear($throttleKey);
             $request->session()->regenerate();
-            Auth::guard('admin')->user()->update(['last_login_at' => now()]);
+            /** @var \App\Models\Admin $admin */
+            $admin = Auth::guard('admin')->user();
+            $admin->update(['terakhir_masuk_pada' => now()]);
 
             return redirect()->intended(route('admin.dashboard'));
         }
@@ -56,9 +56,6 @@ class AuthController extends Controller
         ])->onlyInput('email');
     }
 
-    /**
-     * Log the user out of the application.
-     */
     public function logout(Request $request)
     {
         Auth::guard('admin')->logout();

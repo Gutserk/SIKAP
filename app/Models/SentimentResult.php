@@ -9,22 +9,24 @@ class SentimentResult extends Model
 {
     use HasFactory;
 
+    protected $table = 'hasil_sentimen';
+
     public $timestamps = false;
 
     protected $fillable = [
-        'answer_id',
-        'sentiment',
-        'score',
-        'analyzed_at',
+        'jawaban_id',
+        'sentimen',
+        'skor',
+        'dianalisis_pada',
     ];
 
     protected $casts = [
-        'analyzed_at' => 'datetime',
-        'score' => 'decimal:4',
+        'dianalisis_pada' => 'datetime',
+        'skor' => 'decimal:4',
     ];
 
     public function answer()
     {
-        return $this->belongsTo(Answer::class);
+        return $this->belongsTo(Answer::class, 'jawaban_id');
     }
 }

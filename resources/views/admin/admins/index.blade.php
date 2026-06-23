@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('header_title', 'Manajemen Admin')
+@section('header_title', 'Manajemen Admin -')
 
 @section('admin_content')
 <div class="flex flex-col gap-6">
@@ -70,12 +70,12 @@
             @forelse($admins as $index => $admin)
             <div class="p-4 flex items-start gap-3">
                 <div class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm shrink-0 border border-primary/20">
-                    {{ strtoupper(substr($admin->full_name, 0, 1)) }}
+                    {{ strtoupper(substr($admin->nama_lengkap, 0, 1)) }}
                 </div>
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center justify-between gap-2">
                         <div class="flex items-center gap-1.5 min-w-0">
-                            <span class="font-semibold text-on-surface truncate">{{ $admin->full_name }}</span>
+                            <span class="font-semibold text-on-surface truncate">{{ $admin->nama_lengkap }}</span>
                             @if(auth('admin')->id() === $admin->id)
                                 <span class="badge badge-primary badge-sm text-[10px] shrink-0">Anda</span>
                             @endif
@@ -125,7 +125,7 @@
                         <td class="text-center text-on-surface-variant">{{ $admins->firstItem() + $index }}</td>
                         <td>
                             <div class="flex items-center gap-2">
-                                <span class="text-on-surface-variant group-hover:text-primary transition-colors">{{ $admin->full_name }}</span>
+                                <span class="text-on-surface-variant group-hover:text-primary transition-colors">{{ $admin->nama_lengkap }}</span>
                                 @if(auth('admin')->id() === $admin->id)
                                     <span class="badge badge-primary badge-sm text-[10px] ml-2">Anda</span>
                                 @endif
@@ -183,7 +183,7 @@
                                 <div class="flex flex-col gap-4">
                                     <div>
                                         <label class="label py-1"><span class="label-text font-semibold text-on-surface">Nama Lengkap</span></label>
-                                        <input type="text" name="full_name" value="{{ old('admin_id') == $admin->id ? old('full_name') : $admin->full_name }}" class="input input-bordered w-full rounded-xl bg-surface focus:border-primary text-on-surface {{ (old('admin_id') == $admin->id && $errors->has('full_name')) ? 'border-error focus:border-error' : '' }}">
+                                        <input type="text" name="full_name" value="{{ old('admin_id') == $admin->id ? old('full_name') : $admin->nama_lengkap }}" class="input input-bordered w-full rounded-xl bg-surface focus:border-primary text-on-surface {{ (old('admin_id') == $admin->id && $errors->has('full_name')) ? 'border-error focus:border-error' : '' }}">
                                         @if(old('admin_id') == $admin->id)
                                             @error('full_name')
                                                 <span class="text-error text-xs mt-1 block">{{ $message }}</span>
@@ -232,7 +232,7 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                             </div>
                             <h3 class="text-xl font-bold text-on-surface mb-2">Konfirmasi Hapus</h3>
-                            <p class="text-sm text-on-surface-variant mb-6 whitespace-normal">Apakah Anda yakin ingin menghapus <strong>{{ $admin->full_name }}</strong>? Tindakan ini tidak dapat dibatalkan.</p>
+                            <p class="text-sm text-on-surface-variant mb-6 whitespace-normal">Apakah Anda yakin ingin menghapus <strong>{{ $admin->nama_lengkap }}</strong>? Tindakan ini tidak dapat dibatalkan.</p>
                             <form action="{{ route('admin.admins.destroy', $admin->id) }}" method="POST" class="flex justify-center gap-6">
                                 @csrf
                                 @method('DELETE')

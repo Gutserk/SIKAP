@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', $survey->title . ' - SIKAP')
+@section('title', $survey->judul . ' - SIKAP')
 
 @section('public_content')
 <div class="bg-surface-container py-12 px-4 sm:px-6 lg:px-8 min-h-screen">
@@ -29,8 +29,8 @@
                     </span>
                     <span class="text-xs text-on-surface-variant">{{ $survey->questions->count() }} pertanyaan</span>
                 </div>
-                <h1 class="text-3xl font-extrabold text-on-surface mb-4">{{ $survey->title }}</h1>
-                <p class="text-lg text-on-surface-variant leading-relaxed">{{ $survey->description }}</p>
+                <h1 class="text-3xl font-extrabold text-on-surface mb-4">{{ $survey->judul }}</h1>
+                <p class="text-lg text-on-surface-variant leading-relaxed">{{ $survey->deskripsi }}</p>
 
                 <div class="mt-6 pt-6 border-t border-outline-variant text-sm text-on-surface-variant flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -63,8 +63,8 @@
                         <label class="label pb-1"><span class="label-text font-bold text-on-surface">Jenis Kelamin <span class="text-error">*</span></span></label>
                         <select name="gender" class="select select-bordered rounded-xl bg-surface-container-high border-outline-variant focus:border-primary @error('gender') border-error @enderror" required>
                             <option value="" disabled {{ old('gender') ? '' : 'selected' }}>Pilih...</option>
-                            <option value="M" {{ old('gender') == 'M' ? 'selected' : '' }}>Laki-laki</option>
-                            <option value="F" {{ old('gender') == 'F' ? 'selected' : '' }}>Perempuan</option>
+                            <option value="L" {{ old('gender') == 'L' ? 'selected' : '' }}>Laki-laki</option>
+                            <option value="P" {{ old('gender') == 'P' ? 'selected' : '' }}>Perempuan</option>
                         </select>
                         @error('gender')<span class="text-error text-xs mt-1">{{ $message }}</span>@enderror
                     </div>
@@ -99,7 +99,7 @@
             </div>
 
             <!-- Questions -->
-            @foreach($survey->questions->sortBy('order') as $index => $question)
+            @foreach($survey->questions->sortBy('urutan') as $index => $question)
             <div class="bg-surface rounded-3xl shadow-sm border {{ $errors->has('answers.' . $question->id) ? 'border-error ring-1 ring-error/30' : 'border-outline-variant hover:border-primary/50' }} p-8 md:p-10 relative overflow-hidden group transition-colors">
 
                 <!-- Left accent bar -->
@@ -109,8 +109,8 @@
                 <div class="mb-6">
                     <h3 class="text-xl font-semibold text-on-surface leading-snug">
                         <span class="inline-flex items-center justify-center w-7 h-7 bg-primary/10 text-primary rounded-lg text-sm font-bold mr-2">{{ $index + 1 }}</span>
-                        {{ $question->question_text }}
-                        @if($question->is_required)
+                        {{ $question->teks_pertanyaan }}
+                        @if($question->wajib_diisi)
                             <span class="text-error ml-1 text-base">*</span>
                         @endif
                     </h3>
@@ -118,20 +118,41 @@
 
                 <!-- Answer Input -->
                 <div class="pl-0 sm:pl-9">
-                    @if($question->question_type === 'multiple_choice')
+                    @if($question->tipe_pertanyaan === 'pilihan_ganda')
                         <div class="flex flex-col gap-3">
-                            @foreach($question->options->sortBy('order')->values() as $optIndex => $option)
-                            <label class="flex items-center gap-4 p-4 rounded-xl border border-outline-variant hover:bg-surface-container cursor-pointer transition-all has-[:checked]:border-primary has-[:checked]:bg-primary/5 has-[:checked]:ring-1 has-[:checked]:ring-primary group">
-                                <input type="radio" name="answers[{{ $question->id }}]" value="{{ $option->option_text }}" class="hidden peer" {{ $question->is_required ? 'required' : '' }} {{ old('answers.' . $question->id) == $option->option_text ? 'checked' : '' }}>
-                                <div class="flex items-center justify-center w-8 h-8 shrink-0 rounded-lg bg-surface-container-high text-on-surface-variant font-bold text-sm transition-colors peer-checked:bg-primary peer-checked:text-on-primary peer-checked:shadow-md peer-checked:shadow-primary/30 group-hover:bg-primary/20 group-hover:text-primary">
+                            @foreach($question->options->sortBy('urutan')->values() as $optIndex => $option)
+                            <label class="flex items-center gap-4 p-4 rounded-xl border border-outline-variant cursor-pointer transition-all has-[:checked]:border-primary has-[:checked]:bg-primary/5 has-[:checked]:ring-1 has-[:checked]:ring-primary">
+                                <input type="radio" name="answers[{{ $question->id }}]" value="{{ $option->teks_pilihan }}" class="hidden peer" {{ $question->wajib_diisi ? 'required' : '' }} {{ old('answers.' . $question->id) == $option->teks_pilihan ? 'checked' : '' }}>
+                                <div class="flex items-center justify-center w-8 h-8 shrink-0 rounded-lg bg-primary/20 text-primary font-bold text-sm transition-colors peer-checked:bg-primary peer-checked:text-on-primary peer-checked:shadow-md peer-checked:shadow-primary/30">
                                     {{ chr(65 + $optIndex) }}
                                 </div>
-                                <span class="text-on-surface font-medium peer-checked:text-primary transition-colors">{{ $option->option_text }}</span>
+                                <span class="text-on-surface font-medium peer-checked:text-primary transition-colors">{{ $option->teks_pilihan }}</span>
                             </label>
                             @endforeach
                         </div>
-                    @elseif($question->question_type === 'essay')
-                        <textarea name="answers[{{ $question->id }}]" rows="4" class="textarea textarea-bordered w-full rounded-xl bg-surface-container-high border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 text-on-surface text-base" placeholder="Ketik jawaban Anda di sini..." {{ $question->is_required ? 'required' : '' }}>{{ old('answers.' . $question->id) }}</textarea>
+                    @elseif($question->tipe_pertanyaan === 'skala_linear')
+                        @php $sMin = $question->skala_min ?? 1; $sMax = $question->skala_max ?? 5; @endphp
+                        <div class="space-y-3">
+                            @if($question->skala_min_label || $question->skala_max_label)
+                                <div class="flex justify-between text-sm text-on-surface-variant font-medium px-1">
+                                    <span>{{ $question->skala_min_label ?: '' }}</span>
+                                    <span>{{ $question->skala_max_label ?: '' }}</span>
+                                </div>
+                            @endif
+                            <!-- Lingkaran angka (Google Forms style) -->
+                            <div class="flex flex-wrap justify-center gap-2">
+                                @for($si = $sMin; $si <= $sMax; $si++)
+                                <label class="cursor-pointer group">
+                                    <input type="radio" name="answers[{{ $question->id }}]" value="{{ $si }}" class="hidden peer" {{ $question->wajib_diisi ? 'required' : '' }} {{ old('answers.' . $question->id) == $si ? 'checked' : '' }}>
+                                    <div class="w-12 h-12 rounded-full border-2 border-outline-variant font-bold flex items-center justify-center text-on-surface-variant transition-all select-none text-base
+                                        peer-checked:border-primary peer-checked:bg-primary peer-checked:text-primary-content peer-checked:shadow-md peer-checked:shadow-primary/30
+                                        hover:border-primary hover:bg-primary/10 hover:text-primary">{{ $si }}</div>
+                                </label>
+                                @endfor
+                            </div>
+                        </div>
+                    @elseif($question->tipe_pertanyaan === 'esai')
+                        <textarea name="answers[{{ $question->id }}]" rows="4" class="textarea textarea-bordered w-full rounded-xl bg-surface-container-high border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 text-on-surface text-base" placeholder="Ketik jawaban Anda di sini..." {{ $question->wajib_diisi ? 'required' : '' }}>{{ old('answers.' . $question->id) }}</textarea>
                     @endif
                 </div>
                 @error('answers.' . $question->id)

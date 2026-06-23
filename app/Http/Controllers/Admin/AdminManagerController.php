@@ -19,7 +19,7 @@ class AdminManagerController extends Controller
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
-                $q->where('full_name', 'like', "%{$search}%")
+                $q->where('nama_lengkap', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%");
             });
         }
@@ -30,7 +30,7 @@ class AdminManagerController extends Controller
                     $query->oldest();
                     break;
                 case 'name_asc':
-                    $query->orderBy('full_name', 'asc');
+                    $query->orderBy('nama_lengkap', 'asc');
                     break;
                 case 'newest':
                 default:
@@ -50,7 +50,7 @@ class AdminManagerController extends Controller
     {
         $request->validate([
             'full_name' => 'required|string|max:100',
-            'email'     => 'required|string|email|max:150|ends_with:@batam.go.id|unique:admins',
+            'email'     => 'required|string|email|max:150|ends_with:@batam.go.id|unique:admin',
             'password'  => [
                 'required',
                 'string',
@@ -70,9 +70,9 @@ class AdminManagerController extends Controller
         ]);
 
         $admin = Admin::create([
-            'full_name' => $request->full_name,
-            'email'     => $request->email,
-            'password'  => Hash::make($request->password),
+            'nama_lengkap' => $request->full_name,
+            'email'        => $request->email,
+            'kata_sandi'   => Hash::make($request->password),
         ]);
 
         Log::channel('audit')->info('Admin account created', [
@@ -90,7 +90,7 @@ class AdminManagerController extends Controller
     {
         $request->validate([
             'full_name' => 'required|string|max:100',
-            'email'     => 'required|string|email|max:150|ends_with:@batam.go.id|unique:admins,email,' . $admin->id,
+            'email'     => 'required|string|email|max:150|ends_with:@batam.go.id|unique:admin,email,' . $admin->id,
             'password'  => [
                 'nullable',
                 'string',
@@ -109,12 +109,12 @@ class AdminManagerController extends Controller
         ]);
 
         $data = [
-            'full_name' => $request->full_name,
-            'email'     => $request->email,
+            'nama_lengkap' => $request->full_name,
+            'email'        => $request->email,
         ];
 
         if ($request->filled('password')) {
-            $data['password'] = Hash::make($request->password);
+            $data['kata_sandi'] = Hash::make($request->password);
             Log::channel('audit')->warning('Admin password changed', [
                 'target_admin_id'    => $admin->id,
                 'target_admin_email' => $admin->email,

@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Beranda - SIKAP Diskominfo Batam')
+@section('title', 'Beranda - SIKAP')
 
 @section('public_content')
 
@@ -250,8 +250,8 @@
                         </div>
 
                         <!-- Content -->
-                        <h3 class="text-xl font-bold text-on-surface mb-3 leading-snug">{{ $survey->title }}</h3>
-                        <p class="text-on-surface-variant text-sm leading-relaxed flex-1 line-clamp-3 mb-6">{{ $survey->description }}</p>
+                        <h3 class="text-xl font-bold text-on-surface mb-3 leading-snug">{{ $survey->judul }}</h3>
+                        <p class="text-on-surface-variant text-sm leading-relaxed flex-1 line-clamp-3 mb-6">{{ $survey->deskripsi }}</p>
 
                         <!-- Meta & CTA -->
                         <div class="pt-5 border-t border-outline-variant/50 flex items-center justify-between">

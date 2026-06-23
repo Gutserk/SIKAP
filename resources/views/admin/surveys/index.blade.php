@@ -77,12 +77,12 @@
                 <!-- Card Content (Clickable Area) -->
                 <a href="{{ route('admin.surveys.show', $survey->id) }}" class="pr-8 grow block focus:outline-none before:absolute before:inset-0 before:z-10 before:rounded-2xl group-hover:text-primary transition-colors">
                     <!-- Status Badge -->
-                    @if($survey->status == 'active')
+                    @if($survey->status == 'aktif')
                         <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800 text-xs font-semibold">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                             Aktif
                         </div>
-                    @elseif($survey->status == 'draft')
+                    @elseif($survey->status == 'draf')
                         <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-100 text-amber-800 text-xs font-semibold">
                             <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                             Draft
@@ -93,16 +93,16 @@
                             Ditutup
                         </div>
                     @endif
-                    
-                    <h3 class="font-bold text-lg text-on-surface mt-3 line-clamp-1 group-hover:text-primary transition-colors" title="{{ $survey->title }}">{{ $survey->title }}</h3>
-                    <p class="text-sm text-on-surface-variant mt-1.5 line-clamp-2 leading-relaxed">{{ $survey->description }}</p>
+
+                    <h3 class="font-bold text-lg text-on-surface mt-3 line-clamp-1 group-hover:text-primary transition-colors" title="{{ $survey->judul }}">{{ $survey->judul }}</h3>
+                    <p class="text-sm text-on-surface-variant mt-1.5 line-clamp-2 leading-relaxed">{{ $survey->deskripsi }}</p>
                 </a>
 
                 <!-- Card Footer (Date & Respondents) -->
                 <div class="mt-5 pt-4 border-t border-outline-variant flex items-center justify-between text-xs text-on-surface-variant">
                     <div class="flex items-center gap-1.5">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                        <span>{{ \Carbon\Carbon::parse($survey->start_date)->translatedFormat('d M') }} - {{ \Carbon\Carbon::parse($survey->end_date)->translatedFormat('d M Y') }}</span>
+                        <span>{{ \Carbon\Carbon::parse($survey->tanggal_mulai)->translatedFormat('d M') }} - {{ \Carbon\Carbon::parse($survey->tanggal_selesai)->translatedFormat('d M Y') }}</span>
                     </div>
                     <div class="flex items-center gap-1 font-semibold text-primary bg-primary/10 px-2 py-1 rounded-md tooltip tooltip-top" data-tip="Total Responden">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
@@ -119,7 +119,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                     </div>
                     <h3 class="text-xl font-bold text-on-surface mb-2">Konfirmasi Hapus Survei</h3>
-                    <p class="text-sm text-on-surface-variant mb-6 whitespace-normal">Apakah Anda yakin ingin menghapus survei <strong>{{ $survey->title }}</strong> secara permanen? Seluruh pertanyaan dan respons dari masyarakat akan ikut terhapus.</p>
+                    <p class="text-sm text-on-surface-variant mb-6 whitespace-normal">Apakah Anda yakin ingin menghapus survei <strong>{{ $survey->judul }}</strong> secara permanen? Seluruh pertanyaan dan respons dari masyarakat akan ikut terhapus.</p>
                     <form action="{{ route('admin.surveys.destroy', $survey->id) }}" method="POST" class="flex justify-center gap-3">
                         @csrf
                         @method('DELETE')

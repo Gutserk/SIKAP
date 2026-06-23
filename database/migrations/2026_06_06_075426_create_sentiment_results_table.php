@@ -6,25 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('sentiment_results', function (Blueprint $table) {
+        Schema::create('hasil_sentimen', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('answer_id')->constrained('answers')->cascadeOnDelete();
-            $table->enum('sentiment', ['positive', 'negative', 'neutral']);
-            $table->decimal('score', 5, 4);
-            $table->timestamp('analyzed_at')->useCurrent();
+            $table->foreignId('jawaban_id')->constrained('jawaban')->cascadeOnDelete();
+            $table->enum('sentimen', ['positif', 'negatif', 'netral']);
+            $table->decimal('skor', 5, 4);
+            $table->timestamp('dianalisis_pada')->useCurrent();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('sentiment_results');
+        Schema::dropIfExists('hasil_sentimen');
     }
 };

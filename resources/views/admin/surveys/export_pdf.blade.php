@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Laporan Survei - {{ $survey->title }}</title>
+    <title>Laporan Survei - {{ $survey->judul }}</title>
     <style>
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.5; color: #333; }
         .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 30px; }
@@ -31,11 +31,11 @@
     <table class="info-table">
         <tr>
             <th>Judul Survei</th>
-            <td>: {{ $survey->title }}</td>
+            <td>: {{ $survey->judul }}</td>
         </tr>
         <tr>
             <th>Deskripsi</th>
-            <td>: {{ $survey->description ?? '-' }}</td>
+            <td>: {{ $survey->deskripsi ?? '-' }}</td>
         </tr>
         <tr>
             <th>Status</th>
@@ -47,30 +47,80 @@
         </tr>
         <tr>
             <th>Periode Pelaksanaan</th>
-            <td>: {{ $survey->start_date ? \Carbon\Carbon::parse($survey->start_date)->format('d M Y') : '-' }} s/d {{ $survey->end_date ? \Carbon\Carbon::parse($survey->end_date)->format('d M Y') : '-' }}</td>
+            <td>: {{ $survey->tanggal_mulai ? \Carbon\Carbon::parse($survey->tanggal_mulai)->format('d M Y') : '-' }} s/d {{ $survey->tanggal_selesai ? \Carbon\Carbon::parse($survey->tanggal_selesai)->format('d M Y') : '-' }}</td>
         </tr>
     </table>
+
+    @if($survey->submissions->count() > 0)
+        @php
+            $respondents = $survey->submissions->pluck('respondent')->filter();
+            $totalRespondents = $respondents->count();
+
+            $genderCount = $respondents->groupBy('jenis_kelamin')->map->count();
+            $educationCount = $respondents->groupBy('pendidikan')->map->count()->sortDesc();
+        @endphp
+        <h2 class="section-title">Profil Responden</h2>
+        <table class="stats-table">
+            <thead>
+                <tr>
+                    <th>Jenis Kelamin</th>
+                    <th width="100">Jumlah</th>
+                    <th width="100">Persentase</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Laki-laki</td>
+                    <td>{{ $genderCount['L'] ?? 0 }}</td>
+                    <td>{{ $totalRespondents > 0 ? round((($genderCount['L'] ?? 0) / $totalRespondents) * 100, 1) : 0 }}%</td>
+                </tr>
+                <tr>
+                    <td>Perempuan</td>
+                    <td>{{ $genderCount['P'] ?? 0 }}</td>
+                    <td>{{ $totalRespondents > 0 ? round((($genderCount['P'] ?? 0) / $totalRespondents) * 100, 1) : 0 }}%</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="stats-table">
+            <thead>
+                <tr>
+                    <th>Tingkat Pendidikan</th>
+                    <th width="100">Jumlah</th>
+                    <th width="100">Persentase</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($educationCount as $education => $count)
+                    <tr>
+                        <td>{{ $education }}</td>
+                        <td>{{ $count }}</td>
+                        <td>{{ $totalRespondents > 0 ? round(($count / $totalRespondents) * 100, 1) : 0 }}%</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
 
     <h2 class="section-title">Hasil Jawaban Responden</h2>
 
     @if($survey->questions->count() > 0)
-        @foreach($survey->questions()->orderBy('order')->get() as $index => $question)
+        @foreach($survey->questions()->orderBy('urutan')->get() as $index => $question)
             <div class="question-block">
-                <div class="question-text">{{ $index + 1 }}. {{ $question->question_text }}</div>
-                
-                @if($question->question_type == 'multiple_choice')
+                <div class="question-text">{{ $index + 1 }}. {{ $question->teks_pertanyaan }}</div>
+
+                @if($question->tipe_pertanyaan == 'pilihan_ganda')
                     @php
-                        // Calculate stats
                         $optionsCount = [];
                         foreach($question->options as $opt) {
-                            $optionsCount[$opt->id] = ['text' => $opt->option_text, 'count' => 0];
+                            $optionsCount[$opt->id] = ['text' => $opt->teks_pilihan, 'count' => 0];
                         }
-                        
+
                         $totalAnswers = 0;
                         foreach($survey->submissions as $submission) {
-                            $ans = $submission->answers->where('question_id', $question->id)->first();
-                            if($ans && $ans->option_id && isset($optionsCount[$ans->option_id])) {
-                                $optionsCount[$ans->option_id]['count']++;
+                            $ans = $submission->answers->where('pertanyaan_id', $question->id)->first();
+                            if($ans && $ans->pilihan_id && isset($optionsCount[$ans->pilihan_id])) {
+                                $optionsCount[$ans->pilihan_id]['count']++;
                                 $totalAnswers++;
                             }
                         }
@@ -94,23 +144,109 @@
                             @endforeach
                         </tbody>
                     </table>
+                @elseif($question->tipe_pertanyaan == 'skala_linear')
+                    @php
+                        $sMin = $question->skala_min ?? 1;
+                        $sMax = $question->skala_max ?? 10;
+                        $scaleCount = [];
+                        for ($i = $sMin; $i <= $sMax; $i++) {
+                            $scaleCount[$i] = 0;
+                        }
+
+                        $numericAnswers = [];
+                        foreach ($survey->submissions as $submission) {
+                            $ans = $submission->answers->where('pertanyaan_id', $question->id)->first();
+                            if ($ans && is_numeric($ans->teks_jawaban) && isset($scaleCount[(int) $ans->teks_jawaban])) {
+                                $scaleCount[(int) $ans->teks_jawaban]++;
+                                $numericAnswers[] = (int) $ans->teks_jawaban;
+                            }
+                        }
+
+                        $avgScore = count($numericAnswers) > 0 ? round(array_sum($numericAnswers) / count($numericAnswers), 2) : null;
+                        $totalScaleAnswers = count($numericAnswers);
+                    @endphp
+
+                    @if($avgScore !== null)
+                        <p><strong>Rata-rata Skor:</strong> {{ $avgScore }} (dari skala {{ $sMin }}–{{ $sMax }})</p>
+                    @endif
+
+                    <table class="stats-table">
+                        <thead>
+                            <tr>
+                                <th>Skor</th>
+                                <th width="100">Jumlah</th>
+                                <th width="100">Persentase</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($scaleCount as $score => $count)
+                                <tr>
+                                    <td>{{ $score }}</td>
+                                    <td>{{ $count }}</td>
+                                    <td>{{ $totalScaleAnswers > 0 ? round(($count / $totalScaleAnswers) * 100, 1) : 0 }}%</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 @else
+                    @php
+                        $sentimentCounts = ['positif' => 0, 'netral' => 0, 'negatif' => 0];
+                        $totalSentiment = 0;
+                    @endphp
                     <ul class="answers-list">
                         @php $hasAnswers = false; @endphp
                         @foreach($survey->submissions as $submission)
                             @php
-                                $ans = $submission->answers->where('question_id', $question->id)->first();
+                                $ans = $submission->answers->where('pertanyaan_id', $question->id)->first();
                             @endphp
-                            @if($ans && !empty($ans->answer_text))
-                                <li>{{ $ans->answer_text }}</li>
+                            @if($ans && !empty($ans->teks_jawaban))
+                                <li>
+                                    {{ $ans->teks_jawaban }}
+                                    @if($ans->sentimentResult)
+                                        <em>({{ ucfirst($ans->sentimentResult->sentimen) }}, {{ round($ans->sentimentResult->skor * 100, 1) }}%)</em>
+                                        @php
+                                            $sentimentCounts[$ans->sentimentResult->sentimen]++;
+                                            $totalSentiment++;
+                                        @endphp
+                                    @endif
+                                </li>
                                 @php $hasAnswers = true; @endphp
                             @endif
                         @endforeach
-                        
+
                         @if(!$hasAnswers)
                             <li><em>Belum ada jawaban esai.</em></li>
                         @endif
                     </ul>
+
+                    @if($totalSentiment > 0)
+                        <table class="stats-table">
+                            <thead>
+                                <tr>
+                                    <th>Sentimen</th>
+                                    <th width="100">Jumlah</th>
+                                    <th width="100">Persentase</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Positif</td>
+                                    <td>{{ $sentimentCounts['positif'] }}</td>
+                                    <td>{{ round($sentimentCounts['positif'] / $totalSentiment * 100, 1) }}%</td>
+                                </tr>
+                                <tr>
+                                    <td>Netral</td>
+                                    <td>{{ $sentimentCounts['netral'] }}</td>
+                                    <td>{{ round($sentimentCounts['netral'] / $totalSentiment * 100, 1) }}%</td>
+                                </tr>
+                                <tr>
+                                    <td>Negatif</td>
+                                    <td>{{ $sentimentCounts['negatif'] }}</td>
+                                    <td>{{ round($sentimentCounts['negatif'] / $totalSentiment * 100, 1) }}%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    @endif
                 @endif
             </div>
         @endforeach

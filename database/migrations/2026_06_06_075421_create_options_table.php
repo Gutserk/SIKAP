@@ -6,24 +6,18 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('options', function (Blueprint $table) {
+        Schema::create('pilihan', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('question_id')->constrained('questions')->cascadeOnDelete();
-            $table->string('option_text', 255);
-            $table->unsignedTinyInteger('order');
+            $table->foreignId('pertanyaan_id')->constrained('pertanyaan')->cascadeOnDelete();
+            $table->string('teks_pilihan', 255);
+            $table->unsignedTinyInteger('urutan');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('options');
+        Schema::dropIfExists('pilihan');
     }
 };

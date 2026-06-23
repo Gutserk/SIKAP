@@ -1,66 +1,189 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SIKAP — Sistem Informasi Kuesioner dan Analisis Pendapat
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi survei berbasis web yang dikembangkan untuk **Dinas Komunikasi dan Informatika (Diskominfo) Kota Batam**. Sistem ini memungkinkan pengelolaan survei secara terpusat, visualisasi hasil secara real-time, dan analisis sentimen otomatis untuk jawaban esai menggunakan model BERT berbahasa Indonesia.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Fitur Utama
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**Admin (Petugas)**
+- Login & logout dengan autentikasi berbasis sesi
+- Kelola survei: buat, edit, hapus, dan publikasi
+- Lihat hasil survei dengan visualisasi grafik dan diagram
+- Analisis sentimen otomatis (Positif / Netral / Negatif) untuk jawaban esai
+- Ekspor hasil survei ke format **PDF** dan **Excel**
+- Manajemen akun admin
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+**Responden (Publik)**
+- Lihat daftar survei yang tersedia tanpa perlu login
+- Isi dan kirimkan survei secara online
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Tech Stack
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+| Komponen | Teknologi |
+|---|---|
+| Backend | Laravel 10 / PHP 8.3 |
+| Database | MySQL 8.0 |
+| Frontend | Tailwind CSS 4 + DaisyUI 5 |
+| Sentiment API | Python 3 + Flask + HuggingFace Transformers |
+| Model NLP | `mdhugol/indonesia-bert-sentiment-classification` |
+| Ekspor | DomPDF (PDF) + Maatwebsite Excel |
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## Arsitektur Sistem
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```
+┌─────────────────────────────┐        ┌──────────────────────────┐
+│      Laravel App            │  HTTP  │   Python Sentiment API   │
+│  (PHP + MySQL + Blade)      │──────▶|   (Flask + BERT Model)    │
+│  http://localhost           |        │  http://127.0.0.1:5000   │
+└─────────────────────────────┘        └──────────────────────────┘
+```
 
-### Premium Partners
+Kedua service berjalan secara terpisah. Laravel memanggil Flask API secara internal setiap kali ada jawaban esai yang perlu dianalisis.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+---
 
-## Contributing
+## Prasyarat
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Pastikan sudah terinstall:
 
-## Code of Conduct
+- PHP >= 8.1 + ekstensi: `pdo_mysql`, `mbstring`, `xml`, `zip`
+- [Composer](https://getcomposer.org/)
+- [Node.js](https://nodejs.org/) >= 18 + npm
+- MySQL >= 8.0
+- Python >= 3.10 + pip
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## Instalasi
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 1. Clone repositori
 
-## License
+```bash
+git clone <url-repositori>
+cd sikap
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 2. Install dependensi PHP
+
+```bash
+composer install
+```
+
+### 3. Install dependensi Node.js
+
+```bash
+npm install
+```
+
+### 4. Konfigurasi environment
+
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+Sesuaikan file `.env` dengan konfigurasi lokal Anda:
+
+```env
+DB_DATABASE=sikap
+DB_USERNAME=root
+DB_PASSWORD=your_password
+
+SENTIMENT_API_URL=http://127.0.0.1:5000/predict
+```
+
+### 5. Migrasi dan seeding database
+
+```bash
+php artisan migrate --seed
+```
+
+### 6. Build aset frontend
+
+```bash
+npm run build
+```
+
+### 7. Jalankan server Laravel
+
+```bash
+php artisan serve
+```
+
+Aplikasi dapat diakses di `http://localhost:8000`.
+
+---
+
+## Menjalankan Sentiment Service
+
+Sentiment API harus berjalan agar analisis sentimen jawaban esai dapat berfungsi.
+
+```bash
+cd sikap-sentiment
+
+# Buat virtual environment (hanya pertama kali)
+python -m venv venv
+
+# Aktifkan virtual environment
+# Windows:
+venv\Scripts\activate
+# Linux/macOS:
+source venv/bin/activate
+
+# Install dependensi
+pip install -r requirements.txt
+
+# Jalankan Flask API
+python app.py
+```
+
+API akan berjalan di `http://127.0.0.1:5000`. Model BERT akan diunduh otomatis dari HuggingFace pada saat pertama kali dijalankan (~500 MB).
+
+---
+
+## Akun Default
+
+Setelah menjalankan seeder, gunakan kredensial berikut untuk login sebagai admin:
+
+| Field | Nilai |
+|---|---|
+| Email | `ardanasmirza@batam.go.id` |
+| Password | `password` |
+
+> **Penting:** Ganti password default setelah pertama kali login di lingkungan produksi.
+
+---
+
+## Struktur Direktori
+
+```
+sikap/
+├── app/
+│   ├── Http/Controllers/
+│   │   ├── Admin/          # Controller area admin (dashboard, survei, ekspor, manajemen admin)
+│   │   ├── AuthController.php
+│   │   └── PublicController.php   # Controller area publik (responden)
+│   ├── Models/             # Eloquent models (Survey, Question, Answer, dll)
+│   └── Exports/            # Kelas ekspor Excel
+├── database/
+│   ├── migrations/         # Skema database
+│   └── seeders/            # Data awal (admin, survei contoh)
+├── resources/views/
+│   ├── admin/              # Tampilan area admin
+│   ├── public/             # Tampilan area publik
+│   └── auth/               # Halaman login
+├── routes/
+│   └── web.php             # Definisi semua route
+└── sikap-sentiment/        # Microservice analisis sentimen (Python/Flask)
+```
+
+---
+
+## Lisensi
+
+Proyek ini dikembangkan untuk keperluan internal **Diskominfo Kota Batam**.

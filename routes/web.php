@@ -36,23 +36,23 @@ Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Admin Dashboard (Protected Route)
-Route::middleware('auth:admin')->group(function () {
-    Route::get('/admin/dasbor', [DashboardController::class, 'index'])->name('admin.dashboard');
-    
-    Route::get('/admin/kelola-survei', [SurveyController::class, 'index'])->name('admin.surveys.index');
-    Route::get('/admin/survei/create', [SurveyController::class, 'create'])->name('admin.surveys.create');
-    Route::post('/admin/survei', [SurveyController::class, 'store'])->name('admin.surveys.store');
-    Route::get('/admin/survei/{survey}', [SurveyController::class, 'show'])->name('admin.surveys.show');
-    Route::get('/admin/survei/{survey}/edit', [SurveyController::class, 'edit'])->name('admin.surveys.edit');
-    Route::put('/admin/survei/{survey}', [SurveyController::class, 'update'])->name('admin.surveys.update');
-    Route::delete('/admin/survei/{survey}', [SurveyController::class, 'destroy'])->name('admin.surveys.destroy');
-    Route::get('/admin/survei/{survey}/responden/{submission}', [SurveyController::class, 'showSubmission'])->name('admin.surveys.submissions.show');
-    
-    Route::get('/admin/survei/{survey}/export-excel', [SurveyExportController::class, 'exportExcel'])->name('admin.surveys.export_excel');
-    Route::get('/admin/survei/{survey}/export-pdf', [SurveyExportController::class, 'exportPdf'])->name('admin.surveys.export_pdf');
-    
-    Route::get('/admin/manajemen-admin', [AdminManagerController::class, 'index'])->name('admin.admins.index');
-    Route::post('/admin/manajemen-admin', [AdminManagerController::class, 'store'])->name('admin.admins.store');
-    Route::put('/admin/manajemen-admin/{admin}', [AdminManagerController::class, 'update'])->name('admin.admins.update');
-    Route::delete('/admin/manajemen-admin/{admin}', [AdminManagerController::class, 'destroy'])->name('admin.admins.destroy');
+Route::middleware('auth:admin')->prefix('petugas')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+
+    Route::get('/kelola-survei', [SurveyController::class, 'index'])->name('admin.surveys.index');
+    Route::get('/survei/create', [SurveyController::class, 'create'])->name('admin.surveys.create');
+    Route::post('/survei', [SurveyController::class, 'store'])->name('admin.surveys.store');
+    Route::get('/survei/{survey}', [SurveyController::class, 'show'])->name('admin.surveys.show');
+    Route::get('/survei/{survey}/edit', [SurveyController::class, 'edit'])->name('admin.surveys.edit');
+    Route::put('/survei/{survey}', [SurveyController::class, 'update'])->name('admin.surveys.update');
+    Route::delete('/survei/{survey}', [SurveyController::class, 'destroy'])->name('admin.surveys.destroy');
+    Route::get('/survei/{survey}/responden/{submission}', [SurveyController::class, 'showSubmission'])->name('admin.surveys.submissions.show');
+
+    Route::get('/survei/{survey}/export-excel', [SurveyExportController::class, 'exportExcel'])->name('admin.surveys.export_excel');
+    Route::get('/survei/{survey}/export-pdf', [SurveyExportController::class, 'exportPdf'])->name('admin.surveys.export_pdf');
+
+    Route::get('/manajemen-admin', [AdminManagerController::class, 'index'])->name('admin.admins.index');
+    Route::post('/manajemen-admin', [AdminManagerController::class, 'store'])->name('admin.admins.store');
+    Route::put('/manajemen-admin/{admin}', [AdminManagerController::class, 'update'])->name('admin.admins.update');
+    Route::delete('/manajemen-admin/{admin}', [AdminManagerController::class, 'destroy'])->name('admin.admins.destroy');
 });

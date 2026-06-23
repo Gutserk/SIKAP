@@ -80,8 +80,8 @@
                                 <span class="label-text font-bold text-on-surface">Status <span class="text-error">*</span></span>
                             </label>
                             <select name="status" class="select select-bordered rounded-xl w-full bg-surface-container-high border-primary/30 focus:border-primary focus:ring-2 focus:ring-primary/20 text-on-surface font-semibold @error('status') border-error focus:border-error @enderror" required>
-                                <option value="draft" {{ old('status', 'draft') == 'draft' ? 'selected' : '' }}>Draft (Belum Rilis)</option>
-                                <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Aktif (Publik)</option>
+                                <option value="draf" {{ old('status', 'draf') == 'draf' ? 'selected' : '' }}>Draft (Belum Rilis)</option>
+                                <option value="aktif" {{ old('status') == 'aktif' ? 'selected' : '' }}>Aktif (Publik)</option>
                             </select>
                             @error('status')
                                 <label class="label pt-1 pb-0"><span class="label-text-alt text-error">{{ $message }}</span></label>
@@ -134,18 +134,15 @@ document.addEventListener('DOMContentLoaded', function() {
         const blocks = container.querySelectorAll('.question-block');
         blocks.forEach((block, index) => {
             const badge = block.querySelector('.question-number-badge');
-            if(badge) {
-                badge.textContent = index + 1;
-            }
+            if(badge) badge.textContent = index + 1;
         });
     }
 
     addBtn.addEventListener('click', function() {
         const qIndex = questionCount++;
         const qHtml = `
-            <div class="question-block p-5 border border-outline-variant rounded-xl bg-surface relative group transition-all" data-index="${qIndex}">
-                
-                <!-- Floating Delete Button -->
+            <div class="question-block p-5 border border-outline-variant rounded-xl bg-surface relative transition-all" data-index="${qIndex}">
+
                 <button type="button" class="absolute top-4 right-4 btn btn-sm btn-circle btn-ghost text-rose-500 hover:bg-rose-50 hover:text-rose-600 no-animation btn-remove-question transition-colors" title="Hapus Pertanyaan">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -153,30 +150,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 </button>
 
                 <div class="flex items-start gap-3">
-                    <!-- Number Badge -->
-                    <div class="w-8 h-8 shrink-0 bg-primary/10 text-primary rounded-lg flex items-center justify-center font-bold text-sm question-number-badge">
-                        1
-                    </div>
-                    
+                    <div class="w-8 h-8 shrink-0 bg-primary/10 text-primary rounded-lg flex items-center justify-center font-bold text-sm question-number-badge">1</div>
+
                     <div class="flex-1 pt-1 space-y-4 pr-10">
                         <div class="form-control w-full">
                             <label class="label pb-1 pt-0"><span class="label-text font-bold text-on-surface text-[15px]">Teks Pertanyaan <span class="text-error">*</span></span></label>
                             <input type="text" name="questions[${qIndex}][question_text]" class="input input-bordered rounded-xl w-full bg-surface-container-high border-primary/30 focus:border-primary focus:ring-2 focus:ring-primary/20 text-on-surface text-base" placeholder="Ketik pertanyaan Anda di sini..." required>
                         </div>
-                        
-                        <div class="flex flex-wrap items-center gap-6 mt-2">
-                            <div class="form-control w-full sm:w-64">
+
+                        <div class="flex flex-wrap items-center gap-4 mt-2">
+                            <div class="form-control w-full sm:w-72">
                                 <label class="label pb-1 pt-0"><span class="label-text font-bold text-on-surface text-sm">Jenis Jawaban</span></label>
                                 <select name="questions[${qIndex}][question_type]" class="select select-bordered rounded-xl w-full bg-surface-container-high border-primary/30 question-type-select font-medium text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20">
-                                    <option value="essay">Esai Bebas (Teks Panjang)</option>
-                                    <option value="multiple_choice">Pilihan Ganda (Satu Jawaban)</option>
+                                    <option value="esai">Esai Bebas (Teks Panjang)</option>
+                                    <option value="pilihan_ganda">Pilihan Ganda (Satu Jawaban)</option>
+                                    <option value="skala_linear">Skala Linear (Rating 1–10)</option>
                                 </select>
                             </div>
                             <div class="form-control pt-5">
                                 <input type="hidden" name="questions[${qIndex}][is_required]" value="0">
-                                <label class="cursor-pointer label gap-3 p-0">
-                                    <input type="checkbox" name="questions[${qIndex}][is_required]" value="1" class="toggle toggle-success" checked />
-                                    <span class="label-text font-bold text-on-surface text-sm">Wajib Diisi</span>
+                                <label class="cursor-pointer flex items-center gap-2.5 px-3 py-2 rounded-xl border transition-all w-fit select-none border-slate-200 bg-slate-100 text-slate-500 has-[:checked]:border-emerald-400 has-[:checked]:bg-emerald-50 has-[:checked]:text-emerald-700">
+                                    <input type="checkbox" name="questions[${qIndex}][is_required]" value="1" class="sr-only peer" checked />
+                                    <div class="relative w-9 h-5 shrink-0 rounded-full transition-colors bg-slate-300 peer-checked:bg-emerald-400 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:shadow after:transition-all peer-checked:after:translate-x-4"></div>
+                                    <span class="text-sm font-bold">Wajib Diisi</span>
                                 </label>
                             </div>
                         </div>
@@ -184,64 +180,127 @@ document.addEventListener('DOMContentLoaded', function() {
                         <!-- Options Container -->
                         <div class="options-container hidden mt-4 pt-5 border-t border-outline-variant/50">
                             <label class="label pb-3"><span class="label-text font-bold text-on-surface text-[15px]">Opsi Jawaban</span></label>
-                            <div class="options-list grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <!-- Option inputs will go here -->
-                            </div>
+                            <div class="options-list grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
                             <button type="button" class="btn btn-sm bg-surface-container hover:bg-surface-container-high border border-outline-variant/60 text-on-surface font-semibold mt-4 no-animation btn-add-option rounded-xl shadow-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
-                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" /></svg>
                                 Tambah Opsi Lainnya
                             </button>
+                        </div>
+
+                        <!-- Scale Container -->
+                        <div class="scale-container hidden mt-4 pt-5 border-t border-outline-variant/50">
+                            <label class="label pb-3"><span class="label-text font-bold text-on-surface text-[15px]">Konfigurasi Skala Linear</span></label>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="form-control">
+                                    <label class="label pb-1 pt-0"><span class="label-text text-sm font-semibold text-on-surface">Nilai Minimum</span></label>
+                                    <select name="questions[${qIndex}][scale_min]" class="select select-bordered rounded-xl w-full bg-surface-container-high border-primary/30 focus:border-primary scale-min-input text-on-surface font-medium">
+                                        <option value="1" selected>1</option>
+                                    </select>
+                                </div>
+                                <div class="form-control">
+                                    <label class="label pb-1 pt-0"><span class="label-text text-sm font-semibold text-on-surface">Nilai Maksimum</span></label>
+                                    <select name="questions[${qIndex}][scale_max]" class="select select-bordered rounded-xl w-full bg-surface-container-high border-primary/30 focus:border-primary scale-max-input text-on-surface font-medium">
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">9</option>
+                                        <option value="10" selected>10</option>
+                                    </select>
+                                </div>
+                                <div class="form-control">
+                                    <label class="label pb-1 pt-0"><span class="label-text text-sm font-semibold text-on-surface">Label Minimum <span class="font-normal text-on-surface-variant">(opsional)</span></span></label>
+                                    <input type="text" name="questions[${qIndex}][scale_min_label]" placeholder="Contoh: Sangat Buruk" class="input input-bordered rounded-xl w-full bg-surface-container-high border-primary/30 focus:border-primary scale-min-label-input text-on-surface">
+                                </div>
+                                <div class="form-control">
+                                    <label class="label pb-1 pt-0"><span class="label-text text-sm font-semibold text-on-surface">Label Maksimum <span class="font-normal text-on-surface-variant">(opsional)</span></span></label>
+                                    <input type="text" name="questions[${qIndex}][scale_max_label]" placeholder="Contoh: Sangat Baik" class="input input-bordered rounded-xl w-full bg-surface-container-high border-primary/30 focus:border-primary scale-max-label-input text-on-surface">
+                                </div>
+                            </div>
+                            <div class="mt-4 p-4 bg-surface-container rounded-xl border border-outline-variant/50">
+                                <p class="text-xs font-semibold text-on-surface-variant uppercase tracking-wide mb-3">Pratinjau Skala</p>
+                                <div class="flex items-center gap-3">
+                                    <span class="flex-1 min-w-0 truncate text-xs text-on-surface-variant font-medium text-right scale-min-label-preview"></span>
+                                    <div class="flex gap-1.5 shrink-0 scale-preview-numbers"></div>
+                                    <span class="flex-1 min-w-0 truncate text-xs text-on-surface-variant font-medium scale-max-label-preview"></span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         `;
-        
+
         container.insertAdjacentHTML('beforeend', qHtml);
         const newBlock = container.lastElementChild;
         updateQuestionNumbers();
-        
-        // Handle Question Remove
+
         newBlock.querySelector('.btn-remove-question').addEventListener('click', function() {
-            // Animate out before removing
             newBlock.style.opacity = '0';
             newBlock.style.transform = 'scale(0.98)';
-            setTimeout(() => {
-                newBlock.remove();
-                updateQuestionNumbers();
-            }, 200);
+            setTimeout(() => { newBlock.remove(); updateQuestionNumbers(); }, 200);
         });
 
-        // Handle Type Change to toggle Options
         const typeSelect = newBlock.querySelector('.question-type-select');
         const optsContainer = newBlock.querySelector('.options-container');
         const optsList = newBlock.querySelector('.options-list');
-        
+        const scaleContainer = newBlock.querySelector('.scale-container');
+
         typeSelect.addEventListener('change', function() {
-            if(this.value === 'multiple_choice') {
+            if(this.value === 'pilihan_ganda') {
                 optsContainer.classList.remove('hidden');
-                // add initial 2 options if empty
+                scaleContainer.classList.add('hidden');
                 if(optsList.children.length === 0) {
                     addOption(optsList, qIndex, 'Sangat Setuju');
                     addOption(optsList, qIndex, 'Tidak Setuju');
                 }
+            } else if(this.value === 'skala_linear') {
+                optsContainer.classList.add('hidden');
+                scaleContainer.classList.remove('hidden');
+                updateScalePreview(newBlock);
             } else {
                 optsContainer.classList.add('hidden');
+                scaleContainer.classList.add('hidden');
             }
         });
 
-        // Handle Add Option
         newBlock.querySelector('.btn-add-option').addEventListener('click', function() {
             addOption(optsList, qIndex, '');
         });
+
+        ['.scale-min-input', '.scale-max-input', '.scale-min-label-input', '.scale-max-label-input'].forEach(sel => {
+            const el = newBlock.querySelector(sel);
+            if(el) el.addEventListener('input', () => updateScalePreview(newBlock));
+        });
     });
 
+    function updateScalePreview(block) {
+        const min = parseInt(block.querySelector('.scale-min-input').value) || 1;
+        const max = Math.min(parseInt(block.querySelector('.scale-max-input').value) || 10, min + 9);
+        const preview = block.querySelector('.scale-preview-numbers');
+        const minLabelEl = block.querySelector('.scale-min-label-preview');
+        const maxLabelEl = block.querySelector('.scale-max-label-preview');
+        if(!preview) return;
+        preview.innerHTML = '';
+        for(let i = min; i <= max; i++) {
+            const div = document.createElement('div');
+            div.className = 'w-10 h-10 rounded-full border-2 border-primary/30 text-primary font-bold flex items-center justify-center text-sm bg-primary/5';
+            div.textContent = i;
+            preview.appendChild(div);
+        }
+        const minLabel = block.querySelector('.scale-min-label-input').value;
+        const maxLabel = block.querySelector('.scale-max-label-input').value;
+        if(minLabelEl) minLabelEl.textContent = minLabel || '';
+        if(maxLabelEl) maxLabelEl.textContent = maxLabel || '';
+    }
+
     function updateOptionLetters(list) {
-        const letters = list.querySelectorAll('.option-letter');
-        letters.forEach((badge, index) => {
-            badge.textContent = String.fromCharCode(65 + index); // 65 is 'A'
+        list.querySelectorAll('.option-letter').forEach((badge, index) => {
+            badge.textContent = String.fromCharCode(65 + index);
         });
     }
 
@@ -249,17 +308,15 @@ document.addEventListener('DOMContentLoaded', function() {
         const div = document.createElement('div');
         div.className = 'flex items-center gap-3 p-3 rounded-xl bg-surface border border-outline-variant/60 focus-within:border-primary focus-within:bg-primary/5 transition-all group relative pr-10 shadow-sm';
         div.innerHTML = `
-            <div class="flex items-center justify-center w-7 h-7 shrink-0 rounded-lg bg-surface-container-high group-focus-within:bg-primary group-focus-within:text-primary-content text-on-surface-variant font-bold text-xs transition-colors option-letter">
-                A
-            </div>
-            <input type="text" name="questions[${qIndex}][options][]" value="${defaultVal}" class="input input-sm w-full bg-transparent border-none px-0 focus:outline-none focus:ring-0 text-sm font-medium group-focus-within:text-primary transition-colors h-auto py-0" placeholder="Ketik opsi..." required>
-            <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 btn btn-xs btn-circle btn-ghost text-outline-variant hover:bg-rose-50 hover:text-rose-500 no-animation btn-remove-option opacity-0 group-hover:opacity-100 transition-opacity">
+            <div class="flex items-center justify-center w-7 h-7 shrink-0 rounded-lg bg-primary/20 text-primary font-bold text-xs option-letter">A</div>
+            <input type="text" name="questions[${qIndex}][options][]" value="${defaultVal}" class="input input-sm w-full bg-transparent border-none px-0 focus:outline-none focus:ring-0 text-sm font-medium h-auto py-0" placeholder="Ketik opsi..." required>
+            <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 btn btn-xs btn-circle btn-ghost text-rose-400 hover:bg-rose-100 hover:text-rose-600 no-animation btn-remove-option transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
         `;
         list.appendChild(div);
         updateOptionLetters(list);
-        
+
         div.querySelector('.btn-remove-option').addEventListener('click', function() {
             if(list.children.length > 2) {
                 div.remove();
@@ -270,7 +327,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Add at least 1 question by default
     addBtn.click();
 });
 </script>
