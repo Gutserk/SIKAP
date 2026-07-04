@@ -7,42 +7,57 @@ use Illuminate\Support\Facades\Log;
 
 class SentimentService
 {
-    /**
-     * Analyze text sentiment via the Flask IndoBERT API.
-     *
-     * Returns null on any failure (API down, timeout, unexpected response)
-     * so callers can safely ignore sentiment without breaking their flow.
-     *
-     * @return array{sentimen: string, skor: float}|null
-     */
-    public function analyze(string $text): ?array
+    protected $apiUrl;
+    protected $apiToken;
+    protected $threshold = 0.75;
+
+    protected $labelMap = [
+        'LABEL_0' => 'Positif',
+        'LABEL_1' => 'Netral',
+        'LABEL_2' => 'Negatif',
+    ];
+
+    public function __construct()
+    {
+        $this->apiUrl   = env('HF_API_URL');
+        $this->apiToken = env('HF_API_TOKEN');
+    }
+
+    public function analyze(string $text): array
     {
         try {
-            $response = Http::timeout(5)->post(config('services.sentiment.url'), [
-                'text' => $text,
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $this->apiToken,
+                'Content-Type'  => 'application/json',
+            ])->timeout(30)->post($this->apiUrl, [
+                'inputs' => $text,
             ]);
 
             if (!$response->successful()) {
-                Log::warning('Sentiment API returned a non-successful response', [
-                    'status' => $response->status(),
-                ]);
-                return null;
+                Log::error('HuggingFace API error: ' . $response->body());
+                return ['sentiment' => null, 'confidence' => null];
             }
 
-            $data = $response->json();
+            $results = $response->json()[0]; // array of {label, score}
 
-            if (!isset($data['sentiment'], $data['confidence'])) {
-                Log::warning('Sentiment API response missing expected fields', ['data' => $data]);
-                return null;
+            // Ambil skor tertinggi
+            $best = collect($results)->sortByDesc('score')->first();
+
+            // Terapkan threshold
+            if ($best['score'] < $this->threshold) {
+                $sentiment = 'Netral';
+            } else {
+                $sentiment = $this->labelMap[$best['label']] ?? $best['label'];
             }
 
             return [
-                'sentimen' => strtolower($data['sentiment']),
-                'skor'     => $data['confidence'],
+                'sentiment'  => $sentiment,
+                'confidence' => round($best['score'], 4),
             ];
-        } catch (\Throwable $e) {
-            Log::warning('Sentiment API call failed', ['message' => $e->getMessage()]);
-            return null;
+
+        } catch (\Exception $e) {
+            Log::error('Sentiment analysis failed: ' . $e->getMessage());
+            return ['sentiment' => null, 'confidence' => null];
         }
     }
 }
