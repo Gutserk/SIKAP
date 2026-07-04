@@ -54,8 +54,11 @@ class AdminManagerController extends Controller
             'password'  => [
                 'required',
                 'string',
-                Password::min(8)->letters()->mixedCase()->numbers(),
-                'confirmed',
+                Password::min(8)->letters()->mixedCase()->numbers()->symbols(),
+            ],
+            'password_confirmation' => [
+                'required',
+                'same:password',
             ],
         ], [
             'full_name.required'  => 'Nama lengkap wajib diisi.',
@@ -66,7 +69,8 @@ class AdminManagerController extends Controller
             'email.unique'        => 'Email ini sudah terdaftar.',
             'email.ends_with'     => 'Email harus menggunakan domain @batam.go.id.',
             'password.required'   => 'Password wajib diisi.',
-            'password.confirmed'  => 'Konfirmasi password tidak cocok.',
+            'password_confirmation.required' => 'Konfirmasi password wajib diisi.',
+            'password_confirmation.same'     => 'Konfirmasi password tidak cocok.',
         ]);
 
         $admin = Admin::create([
@@ -94,8 +98,12 @@ class AdminManagerController extends Controller
             'password'  => [
                 'nullable',
                 'string',
-                Password::min(8)->letters()->mixedCase()->numbers(),
-                'confirmed',
+                Password::min(8)->letters()->mixedCase()->numbers()->symbols(),
+            ],
+            'password_confirmation' => [
+                'nullable',
+                'required_with:password',
+                'same:password',
             ],
         ], [
             'full_name.required' => 'Nama lengkap wajib diisi.',
@@ -105,7 +113,8 @@ class AdminManagerController extends Controller
             'email.max'          => 'Email maksimal 150 karakter.',
             'email.unique'       => 'Email ini sudah terdaftar oleh admin lain.',
             'email.ends_with'    => 'Email harus menggunakan domain @batam.go.id.',
-            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+            'password_confirmation.required_with' => 'Konfirmasi password wajib diisi.',
+            'password_confirmation.same'          => 'Konfirmasi password tidak cocok.',
         ]);
 
         $data = [

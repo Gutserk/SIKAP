@@ -92,7 +92,9 @@ class PublicController extends Controller
         );
 
         if (Submission::where('survei_id', $survey->id)->where('responden_id', $respondent->id)->exists()) {
-            return back()->with('error', 'Anda sudah pernah mengisi survei ini sebelumnya.')->withInput();
+            return back()
+                ->withErrors(['email' => 'Email ini sudah pernah digunakan untuk mengisi survei ini sebelumnya.'])
+                ->withInput();
         }
 
         $submission = Submission::create([

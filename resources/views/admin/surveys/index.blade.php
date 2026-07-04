@@ -31,7 +31,12 @@
                         <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
                     </svg>
                 </div>
-                <input type="text" name="search" value="{{ request('search') }}" class="input input-sm h-10 w-full pl-10 rounded-xl bg-surface-container border-none focus:ring-2 focus:ring-primary text-on-surface" placeholder="Cari judul survei...">
+                <input type="text" name="search" id="search-surveys" value="{{ request('search') }}" class="input input-sm h-10 w-full pl-10 {{ request('search') ? 'pr-9' : '' }} rounded-xl bg-surface-container border-none focus:ring-2 focus:ring-primary text-on-surface" placeholder="Cari judul survei...">
+                @if(request('search'))
+                <button type="button" onclick="document.getElementById('search-surveys').value=''; this.closest('form').submit();" class="absolute inset-y-0 right-0 pr-3 flex items-center text-on-surface-variant hover:text-error transition-colors" aria-label="Hapus pencarian">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+                @endif
             </div>
             
             <div class="w-full sm:w-auto flex overflow-x-auto pb-2 sm:pb-0 hide-scrollbar">
