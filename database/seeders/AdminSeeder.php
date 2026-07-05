@@ -3,25 +3,20 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class AdminSeeder extends Seeder
 {
     public function run(): void
     {
-        $admins = [
+        DB::table('admin')->updateOrInsert(
+            ['email' => 'ardanasmirza@batam.go.id'],
             [
                 'nama_lengkap' => 'Mirza Ardanas',
-                'email'        => 'ardanasmirza@batam.go.id',
-                'kata_sandi'   => 'password',
-            ],
-        ];
-
-        foreach ($admins as $admin) {
-            \App\Models\Admin::create([
-                'nama_lengkap' => $admin['nama_lengkap'],
-                'email'        => $admin['email'],
-                'kata_sandi'   => \Illuminate\Support\Facades\Hash::make($admin['kata_sandi']),
-            ]);
-        }
+                'kata_sandi'   => Hash::make('password'),
+                'updated_at'   => now(),
+            ]
+        );
     }
 }
