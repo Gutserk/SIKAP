@@ -57,7 +57,7 @@
                             <label class="label pb-1">
                                 <span class="label-text font-bold text-on-surface">Tanggal Mulai</span>
                             </label>
-                            <input type="date" name="start_date" value="{{ old('start_date') }}" class="input input-bordered rounded-xl w-full bg-surface-container-high border-primary/30 focus:border-primary focus:ring-2 focus:ring-primary/20 text-on-surface @error('start_date') border-error focus:border-error @enderror" />
+                            <input type="date" id="start_date" name="start_date" value="{{ old('start_date') }}" min="{{ now()->toDateString() }}" onclick="this.showPicker && this.showPicker()" class="input input-bordered rounded-xl w-full bg-surface-container-high border-primary/30 focus:border-primary focus:ring-2 focus:ring-primary/20 text-on-surface cursor-pointer @error('start_date') border-error focus:border-error @enderror" />
                             @error('start_date')
                                 <label class="label pt-1 pb-0"><span class="label-text-alt text-error">{{ $message }}</span></label>
                             @enderror
@@ -68,7 +68,7 @@
                             <label class="label pb-1">
                                 <span class="label-text font-bold text-on-surface">Tanggal Selesai</span>
                             </label>
-                            <input type="date" name="end_date" value="{{ old('end_date') }}" class="input input-bordered rounded-xl w-full bg-surface-container-high border-primary/30 focus:border-primary focus:ring-2 focus:ring-primary/20 text-on-surface @error('end_date') border-error focus:border-error @enderror" />
+                            <input type="date" id="end_date" name="end_date" value="{{ old('end_date') }}" min="{{ now()->toDateString() }}" onclick="this.showPicker && this.showPicker()" class="input input-bordered rounded-xl w-full bg-surface-container-high border-primary/30 focus:border-primary focus:ring-2 focus:ring-primary/20 text-on-surface cursor-pointer @error('end_date') border-error focus:border-error @enderror" />
                             @error('end_date')
                                 <label class="label pt-1 pb-0"><span class="label-text-alt text-error">{{ $message }}</span></label>
                             @enderror
@@ -126,6 +126,16 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const startDateInput = document.getElementById('start_date');
+    const endDateInput = document.getElementById('end_date');
+    if (startDateInput && endDateInput) {
+        startDateInput.addEventListener('change', function() {
+            if (startDateInput.value) {
+                endDateInput.min = startDateInput.value;
+            }
+        });
+    }
+
     let questionCount = 0;
     const container = document.getElementById('questions-container');
     const addBtn = document.getElementById('add-question-btn');

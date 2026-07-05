@@ -3,61 +3,50 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 
 class SentimentService
 {
     protected $apiUrl;
-    protected $apiToken;
     protected $threshold = 0.75;
-
-    protected $labelMap = [
-        'LABEL_0' => 'Positif',
-        'LABEL_1' => 'Netral',
-        'LABEL_2' => 'Negatif',
-    ];
 
     public function __construct()
     {
-        $this->apiUrl   = env('HF_API_URL');
-        $this->apiToken = env('HF_API_TOKEN');
+        $this->apiUrl = env('SENTIMENT_API_URL');
     }
 
-    public function analyze(string $text): array
+    /**
+     * Analyze text sentiment via the external sentiment API.
+     *
+     * Returns null on any failure (API down, timeout, unexpected response)
+     * so callers can safely ignore sentiment without breaking their flow.
+     *
+     * @return array{sentimen: string, skor: float}|null
+     */
+    public function analyze(string $text): ?array
     {
         try {
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->apiToken,
-                'Content-Type'  => 'application/json',
-            ])->timeout(30)->post($this->apiUrl, [
-                'inputs' => $text,
+            $response = Http::timeout(30)->post($this->apiUrl, [
+                'text' => $text,
             ]);
 
             if (!$response->successful()) {
-                Log::error('HuggingFace API error: ' . $response->body());
-                return ['sentiment' => null, 'confidence' => null];
+                return null;
             }
 
-            $results = $response->json()[0]; // array of {label, score}
+            $data = $response->json();
 
-            // Ambil skor tertinggi
-            $best = collect($results)->sortByDesc('score')->first();
-
-            // Terapkan threshold
-            if ($best['score'] < $this->threshold) {
-                $sentiment = 'Netral';
-            } else {
-                $sentiment = $this->labelMap[$best['label']] ?? $best['label'];
+            if (!isset($data['sentiment'], $data['confidence'])) {
+                return null;
             }
+
+            $sentimen = $data['confidence'] < $this->threshold ? 'Netral' : $data['sentiment'];
 
             return [
-                'sentiment'  => $sentiment,
-                'confidence' => round($best['score'], 4),
+                'sentimen' => $sentimen,
+                'skor'     => $data['confidence'],
             ];
-
-        } catch (\Exception $e) {
-            Log::error('Sentiment analysis failed: ' . $e->getMessage());
-            return ['sentiment' => null, 'confidence' => null];
+        } catch (\Exception) {
+            return null;
         }
     }
 }

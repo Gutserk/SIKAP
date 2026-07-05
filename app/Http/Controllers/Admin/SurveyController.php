@@ -50,7 +50,7 @@ class SurveyController extends Controller
             'title'                        => 'required|string|max:200',
             'description'                  => 'required|string',
             'status'                       => 'required|in:draf,aktif,ditutup',
-            'start_date'                   => 'nullable|date',
+            'start_date'                   => 'nullable|date|after_or_equal:today',
             'end_date'                     => 'nullable|date|after_or_equal:start_date',
             'questions'                    => 'required|array|min:1',
             'questions.*.question_text'    => 'required|string',
@@ -63,8 +63,10 @@ class SurveyController extends Controller
             'questions.*.scale_min_label'  => 'nullable|string|max:100',
             'questions.*.scale_max_label'  => 'nullable|string|max:100',
         ], [
-            'questions.required' => 'Survei harus memiliki minimal satu pertanyaan.',
-            'questions.min'      => 'Survei harus memiliki minimal satu pertanyaan.',
+            'questions.required'        => 'Survei harus memiliki minimal satu pertanyaan.',
+            'questions.min'             => 'Survei harus memiliki minimal satu pertanyaan.',
+            'start_date.after_or_equal' => 'Tanggal mulai tidak boleh sebelum hari ini.',
+            'end_date.after_or_equal'   => 'Tanggal berakhir harus setelah atau sama dengan tanggal mulai.',
         ]);
 
         \Illuminate\Support\Facades\DB::transaction(function () use ($validated) {
@@ -153,11 +155,18 @@ class SurveyController extends Controller
     {
         $this->authorizeOwner($survey);
 
+        $surveyAlreadyStarted = $survey->tanggal_mulai && $survey->tanggal_mulai->lt(now()->startOfDay());
+
+        $startDateRule = ['nullable', 'date'];
+        if (!$surveyAlreadyStarted) {
+            $startDateRule[] = 'after_or_equal:today';
+        }
+
         $validated = $request->validate([
             'title'                        => 'required|string|max:200',
             'description'                  => 'required|string',
             'status'                       => 'required|in:draf,aktif,ditutup',
-            'start_date'                   => 'nullable|date',
+            'start_date'                   => $startDateRule,
             'end_date'                     => 'nullable|date|after_or_equal:start_date',
             'questions'                    => 'required|array|min:1',
             'questions.*.id'               => 'nullable|exists:pertanyaan,id',
@@ -171,8 +180,10 @@ class SurveyController extends Controller
             'questions.*.scale_min_label'  => 'nullable|string|max:100',
             'questions.*.scale_max_label'  => 'nullable|string|max:100',
         ], [
-            'questions.required' => 'Survei harus memiliki minimal satu pertanyaan.',
-            'questions.min'      => 'Survei harus memiliki minimal satu pertanyaan.',
+            'questions.required'        => 'Survei harus memiliki minimal satu pertanyaan.',
+            'questions.min'             => 'Survei harus memiliki minimal satu pertanyaan.',
+            'start_date.after_or_equal' => 'Tanggal mulai tidak boleh sebelum hari ini.',
+            'end_date.after_or_equal'   => 'Tanggal berakhir harus setelah atau sama dengan tanggal mulai.',
         ]);
 
         \Illuminate\Support\Facades\DB::transaction(function () use ($validated, $survey) {
