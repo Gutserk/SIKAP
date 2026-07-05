@@ -123,28 +123,6 @@ Aplikasi dapat diakses di `http://localhost:8000`.
 
 Sentiment API harus berjalan agar analisis sentimen jawaban esai dapat berfungsi.
 
-```bash
-cd sikap-sentiment
-
-# Buat virtual environment (hanya pertama kali)
-python -m venv venv
-
-# Aktifkan virtual environment
-# Windows:
-venv\Scripts\activate
-# Linux/macOS:
-source venv/bin/activate
-
-# Install dependensi
-pip install -r requirements.txt
-
-# Jalankan Flask API
-python app.py
-```
-
-API akan berjalan di `http://127.0.0.1:5000`. Model BERT akan diunduh otomatis dari HuggingFace pada saat pertama kali dijalankan (~500 MB).
-
----
 
 ## Akun Default
 
