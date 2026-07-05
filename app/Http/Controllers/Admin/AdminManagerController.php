@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\Rules\Password;
 
 use App\Models\Admin;
 use Illuminate\Support\Facades\Hash;
@@ -54,7 +53,8 @@ class AdminManagerController extends Controller
             'password'  => [
                 'required',
                 'string',
-                Password::min(8)->letters()->mixedCase()->numbers()->symbols(),
+                'min:8',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/',
             ],
             'password_confirmation' => [
                 'required',
@@ -69,6 +69,8 @@ class AdminManagerController extends Controller
             'email.unique'        => 'Email ini sudah terdaftar.',
             'email.ends_with'     => 'Email harus menggunakan domain @batam.go.id.',
             'password.required'   => 'Password wajib diisi.',
+            'password.min'        => 'Password minimal harus 8 karakter.',
+            'password.regex'      => 'Password harus mengandung huruf besar, huruf kecil, angka, dan simbol.',
             'password_confirmation.required' => 'Konfirmasi password wajib diisi.',
             'password_confirmation.same'     => 'Konfirmasi password tidak cocok.',
         ]);
@@ -98,7 +100,8 @@ class AdminManagerController extends Controller
             'password'  => [
                 'nullable',
                 'string',
-                Password::min(8)->letters()->mixedCase()->numbers()->symbols(),
+                'min:8',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/',
             ],
             'password_confirmation' => [
                 'nullable',
@@ -113,6 +116,8 @@ class AdminManagerController extends Controller
             'email.max'          => 'Email maksimal 150 karakter.',
             'email.unique'       => 'Email ini sudah terdaftar oleh admin lain.',
             'email.ends_with'    => 'Email harus menggunakan domain @batam.go.id.',
+            'password.min'       => 'Password minimal harus 8 karakter.',
+            'password.regex'     => 'Password harus mengandung huruf besar, huruf kecil, angka, dan simbol.',
             'password_confirmation.required_with' => 'Konfirmasi password wajib diisi.',
             'password_confirmation.same'          => 'Konfirmasi password tidak cocok.',
         ]);
