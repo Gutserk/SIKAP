@@ -9,7 +9,9 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     libzip-dev \
     zip \
-    unzip
+    unzip \
+    nodejs \
+    npm
 
 # Install PHP extensions
 RUN docker-php-ext-install \
@@ -32,8 +34,11 @@ WORKDIR /var/www
 # Copy project files
 COPY . .
 
-# Install dependencies
+# Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction
+
+# Install Node dependencies & build assets
+RUN npm install && npm run build
 
 # Set permissions
 RUN chmod -R 775 storage bootstrap/cache
