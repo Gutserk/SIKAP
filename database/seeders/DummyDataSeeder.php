@@ -143,7 +143,7 @@ class DummyDataSeeder extends Seeder
             }
         }
 
-        for ($i = 0; $i < 40; $i++) {
+        for ($i = 0; $i < 10; $i++) {
             $profileKey = $faker->randomElement($weightedProfiles);
             $profile = $profiles[$profileKey];
 
